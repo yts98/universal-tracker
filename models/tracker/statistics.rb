@@ -16,7 +16,7 @@ module UniversalTracker
         queues = []
         queues << { :key=>"todo",
                     :title=>"Main queue",
-                    :length=>(resp[1].to_i + resp[2].to_i) }
+                    :length=>(resp[1] + resp[2]) }
 
         if resp[0].size > 0
           keys = resp[0].sort
@@ -28,7 +28,7 @@ module UniversalTracker
             if keys[index]=~/^#{ prefix }todo:d:(.+)$/
               queues << { :key=>keys[index][prefix.size, 10000],
                           :title=>"Queue for #{ $1 }",
-                          :length=>length.to_i }
+                          :length=>length }
             end
           end
         end
@@ -234,8 +234,8 @@ module UniversalTracker
         downloader_bytes = resp[1]
         downloader_count = resp[2]
         total_items_done = resp[3].to_i
-        total_items_todo = resp[4].to_i + resp[5].to_i
-        total_items_out = resp[6].to_i
+        total_items_todo = resp[4] + resp[5]
+        total_items_out = resp[6]
         total_items = total_items_done + total_items_todo + total_items_out
 
         total_bytes = 0
@@ -251,10 +251,10 @@ module UniversalTracker
           "downloader_bytes"=>Hash[downloader_bytes.map{ |k,v| [k, v.to_i] }],
           "downloader_count"=>Hash[downloader_count.map{ |k,v| [k, v.to_i] }],
           "downloaders"=>downloader_count.keys,
-          "total_items_done"=>total_items_done.to_i,
-          "total_items"=>total_items.to_i,
+          "total_items_done"=>total_items_done,
+          "total_items"=>total_items,
           "counts"=>{ "todo"=>total_items_todo, "out"=>total_items_out, "done"=>total_items_done },
-          "total_items_out"=>total_items_out.to_i,
+          "total_items_out"=>total_items_out,
           "total_bytes"=>total_bytes
         }
       end

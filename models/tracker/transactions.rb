@@ -66,7 +66,7 @@ module UniversalTracker
           keys.each do |key|
             redis.sismember("#{ prefix }blocked", key) or (not config.ignore_global_blocked and redis.sismember("global_blocked", key))
           end
-        end.any?{|r|r.to_i==1}
+        end.any?
       end
 
       def blocked
@@ -148,7 +148,7 @@ module UniversalTracker
           [ Time.now.sec ]
         )
 
-        return (reply.to_i==1)
+        return (reply==1)
       end
 
       def check_not_blocked_and_request_rate_ok(request_ip, downloader)
@@ -263,7 +263,7 @@ module UniversalTracker
 
         to_add = []
         replies.each_slice(4).each_with_index do |response, idx|
-          if response==[0,0,0,0]
+          if response==[false,false,false,false]
             to_add << items[idx]
           end
         end
@@ -294,7 +294,7 @@ module UniversalTracker
           end
         end
         replies.each_with_index do |reply, idx|
-          added << items[idx] if reply==1
+          added << items[idx] if reply
         end
         added
       end
@@ -442,7 +442,7 @@ module UniversalTracker
             redis.get("#{ prefix }done_counter")
           end
 
-          msg["counts"] = { "todo"=>counts[0].to_i+counts[1].to_i, "out"=>counts[2].to_i, "done"=>counts[3].to_i }
+          msg["counts"] = { "todo"=>counts[0]+counts[1], "out"=>counts[2], "done"=>counts[3].to_i }
 
           redis.publish(tracker_manager.config.redis_pubsub_channel, JSON.dump(msg))
           
